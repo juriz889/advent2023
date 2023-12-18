@@ -12,29 +12,18 @@ public class Path implements Comparable<Path> {
     private final int stepsInCurrentDirection;
     private final Coordinate currentCoordinate;
     private final int heatloss;
-
-    private final int nubmerOfSteps;
-
     private final Integer[][] board;
 
-    private final List<Coordinate> visited;
-    private Direction onlyCurrentDirection;
 
-    public Path(Direction currentDirection, int stepsInCurrentDirection, Coordinate currentCoordinate, int heatloss, int nubmerOfSteps, Integer[][] board, List<Coordinate> visited) {
+    public Path(Direction currentDirection, int stepsInCurrentDirection, Coordinate currentCoordinate, int heatloss, Integer[][] board) {
         this.currentDirection = currentDirection;
-        this.nubmerOfSteps = nubmerOfSteps;
         this.board = board;
-        this.visited = visited;
         if (stepsInCurrentDirection > 3) {
             throw new IllegalArgumentException("Steps in current direction cannot be greater than 3");
         }
         this.stepsInCurrentDirection = stepsInCurrentDirection;
         this.currentCoordinate = currentCoordinate;
         this.heatloss = heatloss;
-    }
-
-    public int getNumberOfSteps() {
-        return nubmerOfSteps;
     }
 
     public Coordinate getCurrentCoordinate() {
@@ -49,10 +38,6 @@ public class Path implements Comparable<Path> {
         return currentDirection;
     }
 
-    public void setOnlyCurrentDirection(Direction direction) {
-        this.onlyCurrentDirection = direction;
-    }
-
     public int getStepsInCurrentDirection() {
         return stepsInCurrentDirection;
     }
@@ -60,11 +45,8 @@ public class Path implements Comparable<Path> {
     public List<Path> next() {
         List<Path> result = new ArrayList<>();
         Set<Direction> possibleDirections;
-        if (onlyCurrentDirection != null) {
-            possibleDirections = EnumSet.of(onlyCurrentDirection);
-        } else {
-            possibleDirections = EnumSet.allOf(Direction.class);
-        }
+
+        possibleDirections = EnumSet.allOf(Direction.class);
         possibleDirections.remove(currentDirection.getOpposite());
         if (stepsInCurrentDirection == 3) {
             possibleDirections.remove(currentDirection);
@@ -76,9 +58,9 @@ public class Path implements Comparable<Path> {
             }
             int heatloss = this.heatloss + board[nextCoordinate.y()][nextCoordinate.x()];
             if (value == currentDirection) {
-                result.add(new Path(value, stepsInCurrentDirection + 1, nextCoordinate, heatloss, nubmerOfSteps + 1, board, List.of()));
+                result.add(new Path(value, stepsInCurrentDirection + 1, nextCoordinate, heatloss, board));
             } else {
-                result.add(new Path(value, 1, nextCoordinate, heatloss, nubmerOfSteps + 1, board, List.of()));
+                result.add(new Path(value, 1, nextCoordinate, heatloss, board));
             }
         }
         return result;

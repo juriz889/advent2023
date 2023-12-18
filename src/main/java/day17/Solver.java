@@ -2,11 +2,7 @@ package day17;
 
 import day3.Coordinate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -16,8 +12,8 @@ public class Solver {
         Board board = boardParser.parse(input);
         PriorityQueue<Path> paths = new PriorityQueue<>();
         Set<DirectionWithCoordinate> coordinateVSHeatloss = new HashSet<>();
-        Path pathEast = new Path(Direction.EAST, 0, new Coordinate(0, 0), 0, 0, board.getBoard(), new ArrayList<>());
-        Path pathSouth = new Path(Direction.SOUTH, 0, new Coordinate(0, 0), 0, 0, board.getBoard(), new ArrayList<>());
+        Path pathEast = new Path(Direction.EAST, 0, new Coordinate(0, 0), 0, board.getBoard());
+        Path pathSouth = new Path(Direction.SOUTH, 0, new Coordinate(0, 0), 0, board.getBoard());
         paths.add(pathEast);
         paths.add(pathSouth);
         Coordinate goal = new Coordinate(board.getBoard()[0].length - 1, board.getBoard().length - 1);
@@ -30,7 +26,6 @@ public class Solver {
             if (path.getCurrentCoordinate().equals(goal)) {
                 if (lowestHeatloss > path.getHeatloss()) {
                     lowestHeatloss = path.getHeatloss();
-                    bestNumberOfSteps = path.getNumberOfSteps();
                     System.out.println("New lowest heatloss: " + lowestHeatloss);
                     bestPath = path;
                 }
