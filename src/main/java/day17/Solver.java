@@ -4,15 +4,18 @@ import day3.Coordinate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Solver {
     public int solve(String input) {
         BoardParser boardParser = new BoardParser();
         Board board = boardParser.parse(input);
-        LinkedList<Path> paths = new LinkedList<>();
-        Map<Coordinate, Map<Direction, Integer>> coordinateVSHeatloss = new HashMap<>();
+        PriorityQueue<Path> paths = new PriorityQueue<>();
+        Set<DirectionWithCoordinate> coordinateVSHeatloss = new HashSet<>();
         Path pathEast = new Path(Direction.EAST, 0, new Coordinate(0, 0), 0, 0, board.getBoard(), new ArrayList<>());
         Path pathSouth = new Path(Direction.SOUTH, 0, new Coordinate(0, 0), 0, 0, board.getBoard(), new ArrayList<>());
         paths.add(pathEast);
@@ -33,34 +36,19 @@ public class Solver {
                 }
                 continue;
             }
-            if (path.getHeatloss() > lowestHeatloss) {
-                continue;
-            }
-            if (bestPath != null) {
-                if (path.getHeatloss() + getMinHeatLos(path.getCurrentCoordinate(), goal) > lowestHeatloss) {
-                    continue;
-                }
-            }
-            coordinateVSHeatloss.putIfAbsent(path.getCurrentCoordinate(), new HashMap<>());
-            Map<Direction, Integer> directionIntegerMap = coordinateVSHeatloss.get(path.getCurrentCoordinate());
-            Integer i = directionIntegerMap.get(path.getCurrentDirection());
-            if (i != null && i < path.getHeatloss()) {
-                continue;
+
+            if (coordinateVSHeatloss.add(new DirectionWithCoordinate(path.getCurrentDirection(), path.getStepsInCurrentDirection(), path.getCurrentCoordinate()))) {
+                paths.addAll(path.next());
             } else {
-                long bestValue = directionIntegerMap.values().stream().mapToInt(Integer::intValue).min().orElse(Integer.MAX_VALUE);
-                if (bestValue + board.getBoard()[path.getCurrentCoordinate().y()][path.getCurrentCoordinate().x()] + 10 < path.getHeatloss()) {
-                    continue;
-                }
-                directionIntegerMap.put(path.getCurrentDirection(), path.getHeatloss());
+                continue;
             }
-            path.next().forEach(paths::addFirst);
-            //System.out.println("Trying paths: " + paths.size());
+
         }
         return lowestHeatloss;
     }
 
     private int getMinHeatLos(Coordinate coordinate, Coordinate goal) {
-        int numberOfSteps = (goal.x() - coordinate.x() * goal.y() - coordinate.y()) / 2;
+        int numberOfSteps = (goal.x() - coordinate.x() + goal.y() - coordinate.y());
         return numberOfSteps;
     }
 }

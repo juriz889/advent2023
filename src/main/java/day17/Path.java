@@ -7,7 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class Path {
+public class Path implements Comparable<Path> {
     private final Direction currentDirection;
     private final int stepsInCurrentDirection;
     private final Coordinate currentCoordinate;
@@ -18,6 +18,7 @@ public class Path {
     private final Integer[][] board;
 
     private final List<Coordinate> visited;
+    private Direction onlyCurrentDirection;
 
     public Path(Direction currentDirection, int stepsInCurrentDirection, Coordinate currentCoordinate, int heatloss, int nubmerOfSteps, Integer[][] board, List<Coordinate> visited) {
         this.currentDirection = currentDirection;
@@ -48,9 +49,22 @@ public class Path {
         return currentDirection;
     }
 
+    public void setOnlyCurrentDirection(Direction direction) {
+        this.onlyCurrentDirection = direction;
+    }
+
+    public int getStepsInCurrentDirection() {
+        return stepsInCurrentDirection;
+    }
+
     public List<Path> next() {
         List<Path> result = new ArrayList<>();
-        Set<Direction> possibleDirections = EnumSet.allOf(Direction.class);
+        Set<Direction> possibleDirections;
+        if (onlyCurrentDirection != null) {
+            possibleDirections = EnumSet.of(onlyCurrentDirection);
+        } else {
+            possibleDirections = EnumSet.allOf(Direction.class);
+        }
         possibleDirections.remove(currentDirection.getOpposite());
         if (stepsInCurrentDirection == 3) {
             possibleDirections.remove(currentDirection);
@@ -68,5 +82,10 @@ public class Path {
             }
         }
         return result;
+    }
+
+    @Override
+    public int compareTo(Path o) {
+        return Integer.compare(this.getHeatloss(), o.getHeatloss());
     }
 }
